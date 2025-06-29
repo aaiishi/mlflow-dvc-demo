@@ -20,7 +20,17 @@ jobs:
       - name: Install DVC and dependencies
         run: |
           pip install dvc[gs] scikit-learn flask mlflow
-          dvc pull
+
+      - name: Configure DVC remote
+        run: |
+          dvc remote add origin https://dagshub.com/aaiishi/mlflow-dvc-demo
+          dvc remote modify origin --local auth basic
+          dvc remote modify origin --local user ${{ secrets.DVC_USER }}
+          dvc remote modify origin --local password ${{ secrets.DVC_PASSWORD }}
+          dvc remote default origin
+
+      - name: Pull data with DVC
+        run: dvc pull
 
       - name: Log in to DockerHub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
